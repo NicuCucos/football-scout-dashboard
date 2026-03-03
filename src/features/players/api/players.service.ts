@@ -12,11 +12,11 @@ export type SearchPlayersArgs = {
     team: string;
 };
 
-export async function searchPlayers({
+export const searchPlayers = async ({
     query,
     position,
     team,
-}: SearchPlayersArgs) {
+}: SearchPlayersArgs) => {
     const q = query.trim();
     const t = team.trim();
 
@@ -30,4 +30,4 @@ export async function searchPlayers({
         SEARCH_PLAYERS_QUERY,
         variables
     );
-}
+};

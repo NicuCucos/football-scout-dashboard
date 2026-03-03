@@ -1,8 +1,12 @@
 import { useMemo, useState } from "react";
 import { useDebounce } from "../../../shared/hooks/useDebounce";
 import type { Player, Position } from "../api/players.gql";
+import { AddToWatchlistModal } from "../components/AddToWatchlistModal";
 import { PlayerCard } from "../components/PlayerCard";
+import { useAddToWatchlist } from "../hooks/useAddToWatchlist";
+import { useRemoveFromWatchlist } from "../hooks/useRemoveFromWatchlist";
 import { useSearchPlayers } from "../hooks/useSearchPlayers";
+import { useWatchlist } from "../hooks/useWatchlist";
 
 const positionOptions: Array<{ label: string; value: Position }> = [
     { label: "Forward", value: "Forward" },
@@ -27,6 +31,24 @@ export const PlayersPage = () => {
         });
 
     const players: Player[] = useMemo(() => data?.searchPlayers ?? [], [data]);
+
+    const [modalOpen, setModalOpen] = useState(false);
+    const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+
+    // watchlist
+    const watchlistQuery = useWatchlist();
+    const watchlistEntries = useMemo(
+        () => watchlistQuery.data ?? [],
+        [watchlistQuery.data]
+    );
+    const entryByPlayerId = useMemo(() => {
+        const m = new Map<string, (typeof watchlistEntries)[number]>();
+        for (const e of watchlistEntries) m.set(e.player.id, e);
+        return m;
+    }, [watchlistEntries]);
+
+    const addToWatchlist = useAddToWatchlist();
+    const removeFromWatchlist = useRemoveFromWatchlist();
 
     return (
         <div className="space-y-4">
@@ -150,17 +172,70 @@ export const PlayersPage = () => {
             {/* Cards grid */}
             {!isLoading && !isError && players.length > 0 && (
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    {players.map((p) => (
-                        <PlayerCard
-                            key={p.id}
-                            player={p}
-                            onAddToWatchlist={() => {
-                                //TODO: implement add to watchlist mutation
-                            }}
-                        />
-                    ))}
+                    {players.map((p) => {
+                        const entry = entryByPlayerId.get(p.id);
+                        const inWatchlist = Boolean(entry);
+
+                        const isRemovingThis =
+                            removeFromWatchlist.isPending &&
+                            removeFromWatchlist.variables?.id === entry?.id;
+
+                        const isLoading =
+                            addToWatchlist.isPending || isRemovingThis;
+
+                        return (
+                            <PlayerCard
+                                key={p.id}
+                                player={p}
+                                inWatchlist={inWatchlist}
+                                loading={isLoading}
+                                onAdd={() => {
+                                    setSelectedPlayer(p);
+                                    setModalOpen(true);
+                                }}
+                                onRemove={() => {
+                                    if (!entry) return;
+                                    if (entry.id.startsWith("optimistic-")) {
+                                        removeFromWatchlist.mutate({
+                                            id: entry.id,
+                                        });
+                                        return;
+                                    }
+                                    removeFromWatchlist.mutate({
+                                        id: entry.id,
+                                    });
+                                }}
+                            />
+                        );
+                    })}
                 </div>
             )}
+            <AddToWatchlistModal
+                open={modalOpen}
+                player={selectedPlayer}
+                isSaving={addToWatchlist.isPending}
+                onClose={() => {
+                    setModalOpen(false);
+                    setSelectedPlayer(null);
+                }}
+                onSave={(notes) => {
+                    if (!selectedPlayer) return;
+
+                    addToWatchlist.mutate(
+                        {
+                            playerId: selectedPlayer.id,
+                            player: selectedPlayer,
+                            notes: notes || null,
+                        },
+                        {
+                            onSuccess: () => {
+                                setModalOpen(false);
+                                setSelectedPlayer(null);
+                            },
+                        }
+                    );
+                }}
+            />
         </div>
     );
 };

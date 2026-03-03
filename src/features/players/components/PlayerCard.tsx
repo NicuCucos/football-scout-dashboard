@@ -3,14 +3,18 @@ import type { Player } from "../api/players.gql";
 
 type Props = {
     player: Player;
-    onAddToWatchlist?: (playerId: string) => void;
-    isAdding?: boolean;
+    inWatchlist: boolean;
+    loading: boolean;
+    onAdd: () => void;
+    onRemove: () => void;
 };
 
 export const PlayerCard: FC<Props> = ({
     player,
-    onAddToWatchlist,
-    isAdding,
+    inWatchlist,
+    loading,
+    onAdd,
+    onRemove,
 }) => {
     return (
         <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 shadow-[0_10px_30px_rgba(0,0,0,0.25)]">
@@ -42,13 +46,23 @@ export const PlayerCard: FC<Props> = ({
                 </div>
             </div>
 
-            <button
-                onClick={() => onAddToWatchlist?.(player.id)}
-                disabled={!onAddToWatchlist || isAdding}
-                className="mt-4 w-full rounded-xl bg-emerald-500/90 px-3 py-2 text-sm font-semibold text-black hover:bg-emerald-500 disabled:opacity-60"
-            >
-                {isAdding ? "Adding..." : "Add to watchlist"}
-            </button>
+            {!inWatchlist ? (
+                <button
+                    onClick={onAdd}
+                    disabled={loading}
+                    className="mt-3 w-full rounded-xl border border-white/10 bg-green-500/10 px-3 py-2 text-sm hover:bg-green-500/20 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+                >
+                    {loading ? "Loading..." : "Add to watchlist"}
+                </button>
+            ) : (
+                <button
+                    onClick={onRemove}
+                    disabled={loading}
+                    className="mt-3 w-full rounded-xl border border-white/10 bg-red-500/10 px-3 py-2 text-sm hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+                >
+                    {loading ? "Loading..." : "Remove from watchlist"}
+                </button>
+            )}
         </div>
     );
 };
