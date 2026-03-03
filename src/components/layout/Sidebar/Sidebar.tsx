@@ -23,12 +23,18 @@ export const Sidebar = () => {
             ].join(" ")}
         >
             <div className="h-full rounded-2xl border border-white/10 bg-white/[0.03] shadow-[0_10px_40px_rgba(0,0,0,0.35)]">
-                <div className="flex items-center justify-between border-b border-white/10 px-3 py-3">
-                    <div className="flex items-center gap-2 min-w-0">
-                        <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-500/15 ring-1 ring-emerald-500/25">
-                            ⚽
-                        </div>
-                        {!collapsed && (
+                <div
+                    className={[
+                        "flex items-center border-b border-white/10 px-3 py-3",
+                        collapsed ? "justify-center" : "justify-between",
+                    ].join(" ")}
+                >
+                    {!collapsed ? (
+                        <div className="flex items-center gap-2 min-w-0">
+                            <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-500/15 ring-1 ring-emerald-500/25">
+                                ⚽
+                            </div>
+
                             <div className="min-w-0">
                                 <div className="truncate text-sm font-semibold">
                                     Scout Desk
@@ -37,12 +43,13 @@ export const Sidebar = () => {
                                     Search • Watch • Matches
                                 </div>
                             </div>
-                        )}
-                    </div>
-
+                        </div>
+                    ) : (
+                        <div />
+                    )}
                     <button
                         onClick={() => setCollapsed((v) => !v)}
-                        className="rounded-xl border border-white/10 bg-white/5 px-2 py-2 text-xs text-white/70 hover:bg-white/10"
+                        className="rounded-xl border border-white/10 bg-white/5 px-2 py-2 text-xs text-white/70 hover:bg-white/10 cursor-pointer"
                         aria-label={
                             collapsed ? "Expand sidebar" : "Collapse sidebar"
                         }
