@@ -1,4 +1,3 @@
-// src/features/watchlist/components/EditNotesModal.tsx
 import { useState, type FC } from "react";
 import type { WatchlistEntry } from "../api/watchlist.gql";
 

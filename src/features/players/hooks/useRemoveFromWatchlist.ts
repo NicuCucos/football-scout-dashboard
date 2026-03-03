@@ -1,4 +1,3 @@
-// src/features/watchlist/hooks/useRemoveFromWatchlist.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { graphqlClient } from "../../../shared/api/graphqlClient";

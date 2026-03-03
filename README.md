@@ -71,3 +71,51 @@ export default defineConfig([
   },
 ])
 ```
+
+# ⚽ Football Scout Dashboard (React + TypeScript + Vite)
+
+A small single-page **Football Scout Dashboard** that lets a scout:
+- search players with filters
+- manage a personal watchlist (add/remove + notes)
+- browse matches and update match status (admin simulation)
+
+The app communicates with a provided **GraphQL API**.
+
+---
+
+## ✨ Features
+
+### ✅ Player Search
+- Search players by query (debounced)
+- Filter by position (and team if enabled in UI)
+- Responsive grid of player cards
+- Watchlist integration (Add → opens notes modal)
+
+### ✅ Watchlist
+- Displays watchlist entries with player details + notes
+- Remove players from watchlist
+- Edit notes via modal (optimistic UI + rollback on error)
+
+### ✅ Matches
+- List matches filterable by status and team
+- Update match status (SCHEDULED → LIVE → FINISHED etc.) via dropdown
+- Optimistic UI update + background revalidation
+
+---
+
+## 🧱 Tech Stack
+
+- **React 18** + **TypeScript**
+- **Vite** (fast dev/build)
+- **React Router** (routing)
+- **@tanstack/react-query** (server-state, caching, optimistic updates)
+- **graphql-request** (GraphQL client)
+- **Tailwind CSS** (UI styling)
+- **react-toastify** (toasts / notifications)
+
+---
+
+## 🚀 Getting Started
+npm install
+npm run dev
+App runs at: http://localhost:5173

@@ -1,4 +1,3 @@
-// src/features/watchlist/hooks/useWatchlist.ts
 import { useQuery } from "@tanstack/react-query";
 import { graphqlClient } from "../../../shared/api/graphqlClient";
 import {
