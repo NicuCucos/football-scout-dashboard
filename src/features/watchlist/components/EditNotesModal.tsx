@@ -1,27 +1,28 @@
+// src/features/watchlist/components/EditNotesModal.tsx
 import { useState, type FC } from "react";
-import type { Player } from "../api/players.gql";
+import type { WatchlistEntry } from "../api/watchlist.gql";
 
 type Props = {
     open: boolean;
-    player: Player | null;
+    entry: WatchlistEntry | null;
     isSaving: boolean;
     onClose: () => void;
     onSave: (notes: string) => void;
 };
 
-export const AddToWatchlistModal: FC<Props> = ({
+export const EditNotesModal: FC<Props> = ({
     open,
-    player,
+    entry,
     isSaving,
     onClose,
     onSave,
 }) => {
-    if (!open || !player) return null;
+    if (!open || !entry) return null;
 
     return (
-        <AddToWatchlistModalInner
-            key={player.id}
-            player={player}
+        <EditNotesModalInner
+            key={entry.id}
+            entry={entry}
             isSaving={isSaving}
             onClose={onClose}
             onSave={onSave}
@@ -30,23 +31,17 @@ export const AddToWatchlistModal: FC<Props> = ({
 };
 
 type InnerProps = {
-    player: Player;
+    entry: WatchlistEntry;
     isSaving: boolean;
     onClose: () => void;
     onSave: (notes: string) => void;
 };
 
-function AddToWatchlistModalInner({
-    player,
-    isSaving,
-    onClose,
-    onSave,
-}: InnerProps) {
-    const [notes, setNotes] = useState("");
+function EditNotesModalInner({ entry, isSaving, onClose, onSave }: InnerProps) {
+    const [notes, setNotes] = useState(entry.notes ?? "");
 
     return (
         <div className="fixed inset-0 z-50">
-            {/* overlay */}
             <button
                 className="absolute inset-0 bg-black/60"
                 onClick={onClose}
@@ -57,10 +52,11 @@ function AddToWatchlistModalInner({
                 <div className="flex items-start justify-between gap-3">
                     <div>
                         <div className="text-base font-semibold">
-                            Add to watchlist
+                            Edit notes
                         </div>
                         <div className="mt-1 text-sm text-white/60">
-                            {player.name} • {player.team} • {player.position}
+                            {entry.player.name} • {entry.player.team} •{" "}
+                            {entry.player.position}
                         </div>
                     </div>
 
@@ -75,14 +71,12 @@ function AddToWatchlistModalInner({
 
                 <div className="mt-4">
                     <label className="mb-1 block text-xs text-white/60">
-                        Notes (optional)
+                        Notes
                     </label>
                     <textarea
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
-                        placeholder="e.g. Strong pressing, good positioning, follow next 3 matches…"
                         rows={4}
-                        maxLength={300}
                         className="w-full resize-none rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 outline-none focus:ring-2 focus:ring-white/20"
                     />
                     <div className="mt-1 text-xs text-white/40">
@@ -100,7 +94,7 @@ function AddToWatchlistModalInner({
                     </button>
 
                     <button
-                        onClick={() => onSave(notes.trim())}
+                        onClick={() => onSave(notes.trim().slice(0, 300))}
                         disabled={isSaving}
                         className="rounded-xl border border-white/10 bg-white/10 px-3 py-2 text-sm hover:bg-white/20 disabled:opacity-50"
                     >
